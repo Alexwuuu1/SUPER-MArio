@@ -109,14 +109,32 @@ public static class MarioSetup
         AssetDatabase.SaveAssets();
     }
     public static void Presentation(){
+        PixelArt("Fish",false);PixelArt("Bowser",true);
         for(int stage=2;stage<=4;stage++){
             EditorSceneManager.OpenScene("Assets/Scenes/1-"+stage+".unity");
             var cam=Camera.main.gameObject;cam.AddComponent<LevelCamera>().end=stage==2?200:stage==3?160:128;
             root=new GameObject("Detalles");
+            foreach(var sr in UnityEngine.Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None)){
+                string art=sr.name=="Bowser"?"Bowser":stage==3&&sr.name=="Goomba_Walk1"?"Fish":null;
+                if(art!=null){sr.sprite=AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/"+art+".png");sr.color=Color.white;}
+            }
             if(stage==3){for(int x=4;x<155;x+=6){var bubble=Tile("Coin",x,4+(x%6),.16f,.2f,new Color(.65f,.9f,1,.5f),false);bubble.AddComponent<LevelMotion>().travel=new Vector3(0,2,0);}}
             if(stage==4){for(int x=7;x<123;x+=12){Tile("Brick",x,7,.6f,1,new Color(.3f,.2f,.2f),false);var fire=Tile("Coin",x,7.8f,.6f,.9f,new Color(1,.4f,.03f),false);fire.AddComponent<LevelMotion>().travel=new Vector3(0,.14f,0);}}
             Save(stage);
         }
+    }
+    private static void PixelArt(string name,bool boss){
+        string[] rows=boss?new[]{
+            "........................",".....WW.................","....WYYW.....GGGG.......","...YYYYYW..GGGGGGGG.....","..YYYYYYWWGGWGGWGGGG....","..YYKYYYYGGGGGGGGGGGG...",".YYYYYYYYGGGGGGGGGGGGW..","YYYYYYYYYGGWGGGWGGGGGW..","YYYYYYYYYGGGGGGGGGGGGW..",".WWWYYYYYGGGGGGGGGGGGW..","..YYYYYYYGGGGGGGGGGGGW..","...YYYYYYGGWGGGWGGGGGW..","..YYYYYYYYGGGGGGGGGGGW..",".YYYYYYYYYYGGGGGGGGGGW..",".YYYYYYYYYYYGGGGGGGGW...","..YYYYYYYYYYYGGGGGGW....","...YYYYYYYYYYYYGGGW.....","...YYY..YYYYYYYYYY......","..YYYY...YYYYYYYY.......",".YYYYY....YYYYYYY.......","WWWWWW....WWWWWWW.......","........................","........................","........................"} : new[]{
+            "................","......RRR.......","....RRRRRRR.....","...RRRRRRRRR....","..RRWRRRRRRR....",".RRWKKRRRRRR.RR.","RRRWWRRRRRRRRRRR","RRRRRRRRRRRRRRRR",".WWWWWWWWWWRRRRR","..WWWWWWWWWW.RR.","...WWWWWWWW.....","....WWWWWW......","......RRR.......","................","................","................"};
+        int n=rows.Length;var tex=new Texture2D(n,n,TextureFormat.RGBA32,false);tex.filterMode=FilterMode.Point;
+        for(int y=0;y<n;y++)for(int x=0;x<n;x++){
+            char ch=x<rows[y].Length?rows[y][x]:'.';Color c=Color.clear;
+            if(ch=='W')c=new Color(1,.95f,.75f);else if(ch=='Y')c=new Color(.95f,.6f,.13f);else if(ch=='G')c=new Color(.2f,.6f,.18f);else if(ch=='R')c=new Color(1,.25f,.22f);else if(ch=='K')c=new Color(.08f,.08f,.1f);
+            tex.SetPixel(x,n-y-1,c);
+        }
+        tex.Apply();string path="Assets/Sprites/"+name+".png";File.WriteAllBytes(path,tex.EncodeToPNG());AssetDatabase.ImportAsset(path);
+        var importer=(TextureImporter)AssetImporter.GetAtPath(path);importer.textureType=TextureImporterType.Sprite;importer.spritePixelsPerUnit=n;importer.filterMode=FilterMode.Point;importer.textureCompression=TextureImporterCompression.Uncompressed;importer.SaveAndReimport();
     }
     public static void Integration(){
         for(int stage=2;stage<=4;stage++){
