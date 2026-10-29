@@ -39,14 +39,14 @@ public static class MarioChecks
             var gm=GameManager.Instance;
             switch(step++){
                 case 0:Require(gm!=null&&SceneManager.GetActiveScene().name=="Menu","menu y administrador activos");gm.NewGame();break;
-                case 1:Require(SceneManager.GetActiveScene().name=="Map"&&gm.unlockedStage==1,"mapa inicial y primer nivel desbloqueado");gm.LoadLevel(1,1);break;
+                case 1:Require(SceneManager.GetActiveScene().name=="Map"&&gm.unlockedStage==1,"mapa inicial y primer nivel desbloqueado");Require(MarioAudio.MusicPlaying&&MarioAudio.MusicVolume>.1f,"musica ambiente reproduciendose con volumen audible");gm.LoadLevel(1,1);break;
                 case 2:Require(UnityEngine.Object.FindFirstObjectByType<Player>()!=null,"jugador en nivel 1-1");Snapshot("01-superficie");gm.NextLevel();break;
                 case 3:Require(SceneManager.GetActiveScene().name=="Map"&&gm.unlockedStage==2,"desbloqueo del subsuelo");gm.LoadLevel(1,2);break;
                 case 4:Require(gm.timeRemaining<400&&gm.timeRemaining>395,"temporizador del subsuelo");Require(UnityEngine.Object.FindFirstObjectByType<LevelPortal>()!=null,"salida del subsuelo");Snapshot("02-subterraneo");var coin=UnityEngine.Object.FindObjectsByType<PowerUp>(FindObjectsSortMode.None).First(c=>c.type==PowerUp.Type.Coin);var p=UnityEngine.Object.FindFirstObjectByType<Player>();p.GetComponent<Rigidbody2D>().position=coin.transform.position;break;
                 case 5:Require(gm.coins>0&&gm.score>=200,"recoger moneda suma contador y puntaje");var exit2=UnityEngine.Object.FindFirstObjectByType<LevelPortal>();UnityEngine.Object.FindFirstObjectByType<Player>().GetComponent<Rigidbody2D>().position=exit2.transform.position;break;
                 case 6:Require(SceneManager.GetActiveScene().name=="Map"&&gm.unlockedStage==3,"desbloqueo del oceano");gm.LoadLevel(1,3);break;
                 case 7:Require(UnityEngine.Object.FindFirstObjectByType<WaterMotion>().GetComponent<Player>()!=null,"mecanica de nado unida al jugador");Require(gm.timeRemaining<400,"temporizador acuatico activo");Snapshot("03-acuatico");var exit3=UnityEngine.Object.FindFirstObjectByType<LevelPortal>();UnityEngine.Object.FindFirstObjectByType<Player>().GetComponent<Rigidbody2D>().position=exit3.transform.position;break;
-                case 8:Require(SceneManager.GetActiveScene().name=="Map"&&gm.unlockedStage==4,"desbloqueo del castillo");gm.LoadLevel(1,4);break;
+                case 8:Require(SceneManager.GetActiveScene().name=="Map"&&gm.unlockedStage==4,"desbloqueo del castillo; escena="+SceneManager.GetActiveScene().name+" vidas="+gm.lives);gm.LoadLevel(1,4);break;
                 case 9:Require(UnityEngine.Object.FindFirstObjectByType<CastleBoss>()!=null&&UnityEngine.Object.FindFirstObjectByType<CastleAxe>()!=null,"jefe y mecanismo final presentes");Snapshot("04-castillo");var camera=Camera.main;camera.transform.position=new Vector3(112,6,-10);Snapshot("05-puente-bowser");gm.NextLevel();break;
                 case 10:Require(SceneManager.GetActiveScene().name=="Victory","victoria al completar castillo");gm.NewGame();break;
                 case 11:gm.LoadLevel(1,2);break;
@@ -55,7 +55,9 @@ public static class MarioChecks
                 case 14:Require(gm.lives==1,"segunda muerte resta una vida");gm.ResetLevel();break;
                 case 15:Require(gm.lives==0&&SceneManager.GetActiveScene().name=="GameOver","game over tras perder todas las vidas");gm.NewGame();break;
                 case 16:Require(gm.lives==3&&gm.coins==0&&gm.score==0&&gm.unlockedStage==1,"reinicio limpio de partida");gm.StartTestLevel(4);break;
-                case 17:Require(gm.lives==3&&gm.testingLevel&&gm.unlockedStage==4&&SceneManager.GetActiveScene().name=="1-4","selector abre castillo directamente con tres vidas");Finish();break;
+                case 17:Require(gm.lives==3&&gm.testingLevel&&gm.unlockedStage==4&&SceneManager.GetActiveScene().name=="1-4","selector abre castillo directamente con tres vidas");gm.NewGame();break;
+                case 18:ScreenCapture.CaptureScreenshot("../Mario-Capturas/mapa-nuevo.png");break;
+                case 19:Finish();break;
             }
         }catch(Exception e){failed=true;Debug.LogError("CHECK_FAILED: "+e);Finish();}
     }

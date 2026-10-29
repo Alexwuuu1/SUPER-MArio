@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     public bool testingLevel { get; private set; }
     public float timeRemaining { get; private set; } = 400f;
     public bool playing => SceneManager.GetActiveScene().name.StartsWith("1-");
+    private bool changingScene;
+    private void SceneReady(Scene scene,LoadSceneMode mode) { changingScene=false; }
 
     private void Awake()
     {
@@ -29,12 +31,14 @@ public class GameManager : MonoBehaviour
         } else {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += SceneReady;
         }
     }
 
     private void OnDestroy()
     {
         if (Instance == this) {
+            SceneManager.sceneLoaded -= SceneReady;
             Instance = null;
         }
     }
@@ -53,6 +57,7 @@ public class GameManager : MonoBehaviour
 
     public void NewGame()
     {
+        CancelInvoke(); changingScene=true;
         lives = 3;
         coins = 0;
         score = 0;
@@ -71,11 +76,13 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+        CancelInvoke(); changingScene=true;
         SceneManager.LoadScene("GameOver");
     }
 
     public void LoadLevel(int world, int stage)
     {
+        CancelInvoke(); changingScene=true;
         this.world = world;
         this.stage = stage;
         timeRemaining = 400f;
@@ -85,12 +92,14 @@ public class GameManager : MonoBehaviour
 
     public void NextLevel()
     {
+        CancelInvoke(); changingScene=true;
         if (stage >= 4) SceneManager.LoadScene("Victory");
         else { unlockedStage = Mathf.Max(unlockedStage,stage+1); stage++; SceneManager.LoadScene("Map"); }
     }
 
     public void ResetLevel(float delay)
     {
+        if(changingScene || !playing)return;
         CancelInvoke(nameof(ResetLevel));
         Invoke(nameof(ResetLevel), delay);
     }

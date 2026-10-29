@@ -6096,6 +6096,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dbc865cf276a0f4ab7bdc2694d73170, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MarioScreen
+  mapPlayer: {fileID: 2800000, guid: 316669850fc22b947a5ffd08a201559e, type: 3}
+  mapCastle: {fileID: 2800000, guid: 331491a7c5b40654186a541d64efdd47, type: 3}
+  mapPipe: {fileID: 2800000, guid: 904eec77acde2574699c0198147e141b, type: 3}
 --- !u!114 &918769348
 MonoBehaviour:
   m_ObjectHideFlags: 0

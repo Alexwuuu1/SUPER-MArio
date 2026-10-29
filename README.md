@@ -9,7 +9,7 @@ Proyecto de Unity **6000.3.16f1**, basado en el repositorio compartido para la a
 3. Elegir **1 jugador** para recorrer el mapa con desbloqueos, o **Selector de niveles** para probar directamente cualquier escenario con tres vidas y los contadores en cero.
 4. Detener Play antes de cambiar de escena en el editor. Cada nivel tambien puede abrirse individualmente.
 
-**Controles:** A/D o flechas para moverse; espacio para saltar o impulsarse al nadar. Ratón para los botones del menú, mapa y selector.
+**Controles:** A/D o flechas para moverse y cambiar de dirección también en el aire; espacio para saltar o impulsarse al nadar; S para entrar en las tuberías de la sala de monedas; M para activar o silenciar la música. El volumen se puede ajustar con el deslizador. Ratón para los botones del menú, mapa y selector.
 
 ## Mejoras
 
@@ -18,14 +18,16 @@ Proyecto de Unity **6000.3.16f1**, basado en el repositorio compartido para la a
 - Música diferente por ambiente y efectos de salto, moneda, pisotón, powerup, daño y muerte.
 - HUD de puntaje, monedas, tiempo y vidas; monedas y enemigos aportan puntaje.
 - Escenas de Game Over y victoria, con reinicio de partida.
-- Nivel subterráneo con bloques, enemigos, monedas y salida hacia el agua.
-- Nivel acuático con nado, animación, peces, burbujas y salida hacia el castillo.
+- Subterráneo basado en la distribución de World 1-2: columnas, bloques de objetos y monedas, tres tuberías, sala opcional de 27 monedas, ascensores en ambos sentidos y salida hacia el agua.
+- Acuático basado en World 2-2: recorrido de 192 bloques, huecos, plataformas, pasos estrechos, coral, Cheep Cheeps y Bloopers, nado y salida hacia el castillo.
 - **La Forja de Bowser:** escenario propio con tres zonas de lava, plataformas móviles, barras de fuego, antorchas y puente final. Al llegar al mecanismo dorado se elimina el puente y se habilita la salida.
 - Cámara con seguimiento y límites en los tres escenarios añadidos.
 
 ## Estado de revisión
 
-Esta versión está preparada para pruebas en el editor. Los niveles subterráneo y acuático son recreaciones simplificadas; queda contrastar su distribución con los mapas originales para cumplir el requisito de réplica exacta. El castillo es una propuesta original.
+La distribución del subterráneo y del acuático se reconstruyó tomando como referencia los mapas de World 1-2 y World 2-2. Son recreaciones aproximadas del recorrido original, con físicas y comportamiento de enemigos adaptados a este proyecto de Unity. El castillo es una propuesta original.
+
+Referencias de distribución: [World 1-2](https://www.nesmaps.com/maps/SuperMarioBrothers/SuperMarioBrosWorld1-2Map.html) y [World 2-2](https://www.nesmaps.com/maps/SuperMarioBrothers/SuperMarioBrosWorld2-2Map.html), mapas de Rick N. Bruns / NESMaps.
 
 El ejecutable se generará después de revisar la jugabilidad.
 
