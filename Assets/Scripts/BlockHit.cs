@@ -13,6 +13,9 @@ public class BlockHit : MonoBehaviour
         if (!animating && maxHits != 0 && collision.gameObject.CompareTag("Player"))
         {
             if (collision.transform.DotTest(transform, Vector2.up)) {
+                if(item==null && collision.gameObject.GetComponent<Player>().big) {
+                    GameManager.Instance.AddScore(50);MarioAudio.Play("stomp");Destroy(gameObject);return;
+                }
                 Hit();
             }
         }

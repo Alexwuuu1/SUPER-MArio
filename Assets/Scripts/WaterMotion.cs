@@ -6,6 +6,7 @@ public class WaterMotion : MonoBehaviour
     private Rigidbody2D body;
     private float vy;
     private bool queued;
+    public float end=192;
     private void Start(){movement=GetComponent<PlayerMovement>();movement.enabled=false;body=GetComponent<Rigidbody2D>();body.bodyType=RigidbodyType2D.Dynamic;GetComponent<Collider2D>().enabled=true;}
     private void Update(){
         if(GetComponent<Player>().dead)return;
@@ -17,7 +18,7 @@ public class WaterMotion : MonoBehaviour
         if(queued){vy=5.5f;queued=false;}
         vy=Mathf.Max(vy-8*Time.fixedDeltaTime,-2.7f);
         var p=body.position+new Vector2(Input.GetAxisRaw("Horizontal")*4,vy)*Time.fixedDeltaTime;
-        p.y=Mathf.Clamp(p.y,1.1f,10.5f);p.x=Mathf.Clamp(p.x,.7f,159);
+        p.y=Mathf.Clamp(p.y,-4f,10.5f);p.x=Mathf.Clamp(p.x,.7f,end-1);
         body.MovePosition(p);
     }
 }

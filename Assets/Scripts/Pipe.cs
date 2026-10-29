@@ -7,10 +7,11 @@ public class Pipe : MonoBehaviour
     public KeyCode enterKeyCode = KeyCode.S;
     public Vector3 enterDirection = Vector3.down;
     public Vector3 exitDirection = Vector3.zero;
+    private bool entering;
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (connection != null && other.CompareTag("Player"))
+        if (!entering && connection != null && other.CompareTag("Player"))
         {
             if (Input.GetKey(enterKeyCode)) {
                 StartCoroutine(Enter(other.transform));
@@ -20,6 +21,7 @@ public class Pipe : MonoBehaviour
 
     private IEnumerator Enter(Transform player)
     {
+        entering = true;
         player.GetComponent<PlayerMovement>().enabled = false;
 
         Vector3 enteredPosition = transform.position + enterDirection;
@@ -29,7 +31,8 @@ public class Pipe : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         var sideSrolling = Camera.main.GetComponent<SideScrolling>();
-        sideSrolling.SetUnderground(connection.position.y < sideSrolling.undergroundThreshold);
+        if(sideSrolling!=null)sideSrolling.SetUnderground(connection.position.y < sideSrolling.undergroundThreshold);
+        else {var position=Camera.main.transform.position;position.y=connection.position.y<0?-8:6;Camera.main.transform.position=position;}
 
         if (exitDirection != Vector3.zero)
         {
@@ -43,6 +46,7 @@ public class Pipe : MonoBehaviour
         }
 
         player.GetComponent<PlayerMovement>().enabled = true;
+        entering = false;
     }
 
     private IEnumerator Move(Transform player, Vector3 endPosition, Vector3 endScale)
