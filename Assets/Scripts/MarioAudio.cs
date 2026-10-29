@@ -17,6 +17,7 @@ public class MarioAudio : MonoBehaviour
         SceneManager.sceneLoaded+=Loaded;
     }
     private void OnDestroy() { SceneManager.sceneLoaded-=Loaded; if(instance==this)instance=null; }
+    private void Start() { if(music.clip==null)Loaded(SceneManager.GetActiveScene(),LoadSceneMode.Single); }
     private void Loaded(Scene scene,LoadSceneMode mode) {
         music.Stop();
         if(scene.name=="GameOver") { Play("death"); return; }

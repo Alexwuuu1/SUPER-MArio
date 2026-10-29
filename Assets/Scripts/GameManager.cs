@@ -3,6 +3,13 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void EnsureSession()
+    {
+        if (Instance == null) new GameObject("Game Manager").AddComponent<GameManager>();
+        if (Instance.GetComponent<MarioScreen>() == null) Instance.gameObject.AddComponent<MarioScreen>();
+        if (Instance.GetComponent<MarioAudio>() == null) Instance.gameObject.AddComponent<MarioAudio>();
+    }
     public static GameManager Instance { get; private set; }
 
     public int world { get; private set; }
@@ -11,6 +18,7 @@ public class GameManager : MonoBehaviour
     public int coins { get; private set; }
     public int score { get; private set; }
     public int unlockedStage { get; private set; } = 1;
+    public bool testingLevel { get; private set; }
     public float timeRemaining { get; private set; } = 400f;
     public bool playing => SceneManager.GetActiveScene().name.StartsWith("1-");
 
@@ -35,7 +43,12 @@ public class GameManager : MonoBehaviour
     {
         Application.targetFrameRate = 60;
 
-        if (playing) { lives = 3; world = 1; stage = 1; }
+        if (playing) {
+            lives = 3; world = 1;
+            var name = SceneManager.GetActiveScene().name;
+            stage = int.Parse(name.Substring(2));
+            unlockedStage = stage;
+        }
     }
 
     public void NewGame()
@@ -44,8 +57,16 @@ public class GameManager : MonoBehaviour
         coins = 0;
         score = 0;
         unlockedStage = 1;
+        testingLevel = false;
         stage = 1;
         SceneManager.LoadScene("Map");
+    }
+
+    public void StartTestLevel(int selectedStage)
+    {
+        CancelInvoke();
+        lives = 3; coins = 0; score = 0; unlockedStage = 4; testingLevel = true;
+        LoadLevel(1,Mathf.Clamp(selectedStage,1,4));
     }
 
     public void GameOver()
