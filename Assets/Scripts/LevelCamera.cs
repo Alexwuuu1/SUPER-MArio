@@ -5,7 +5,7 @@ public class LevelCamera : MonoBehaviour
     public float end=110;
     private Transform target;
     private float speed;
-    private void Start(){target=GameObject.FindGameObjectWithTag("Player").transform;}
+    private void Start(){target=FindFirstObjectByType<Player>().transform;}
     private void LateUpdate(){
         if(target==null)return;
         float half=GetComponent<Camera>().orthographicSize*GetComponent<Camera>().aspect;

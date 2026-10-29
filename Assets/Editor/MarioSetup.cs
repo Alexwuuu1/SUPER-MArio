@@ -79,7 +79,7 @@ public static class MarioSetup
                 foreach(int x in new[]{35,59,102,145})Prefab("MysteryBlock",x,4,root.transform);
                 Prefab("MagicMushroom",7,1.5f,root.transform);
             }else if(stage==3){
-                GameObject.FindGameObjectWithTag("Player").AddComponent<WaterMotion>();
+                UnityEngine.Object.FindFirstObjectByType<Player>().gameObject.AddComponent<WaterMotion>();
                 foreach(int x in new[]{16,35,54,73,96,123,146}){
                     var fish=Tile("Goomba_Walk1",x,5+(x%4),1.1f,1,new Color(1,.45f,.4f),false);
                     fish.AddComponent<CircleCollider2D>().isTrigger=true;fish.AddComponent<LevelHazard>();var motion=fish.AddComponent<LevelMotion>();motion.travel=new Vector3(4,1.3f,0);motion.speed=.8f+x*.003f;
@@ -163,6 +163,12 @@ public static class MarioSetup
         var result=BuildPipeline.BuildPlayer(EditorBuildSettings.scenes.Where(s=>s.enabled).Select(s=>s.path).ToArray(),"Builds/Windows/SuperMario.exe",BuildTarget.StandaloneWindows64,BuildOptions.None);
         if(result.summary.result!=BuildResult.Succeeded)throw new Exception("Build failed: "+result.summary.result);
         Debug.Log("MARIO_BUILD_OK "+result.summary.totalSize);
+    }
+    public static void RepairWater(){
+        EditorSceneManager.OpenScene("Assets/Scenes/1-3.unity");
+        foreach(var water in UnityEngine.Object.FindObjectsByType<WaterMotion>(FindObjectsSortMode.None))UnityEngine.Object.DestroyImmediate(water);
+        UnityEngine.Object.FindFirstObjectByType<Player>().gameObject.AddComponent<WaterMotion>();
+        EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
     }
 }
 

@@ -18,6 +18,11 @@ public class PlayerSpriteRenderer : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (movement.GetComponent<WaterMotion>() != null) {
+            run.enabled = false;
+            spriteRenderer.sprite = Mathf.Sin(Time.time * 10f) > 0 ? jump : idle;
+            return;
+        }
         run.enabled = movement.running;
 
         if (movement.jumping) {

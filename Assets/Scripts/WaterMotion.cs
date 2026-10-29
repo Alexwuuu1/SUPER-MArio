@@ -17,7 +17,7 @@ public class WaterMotion : MonoBehaviour
         if(queued){vy=5.5f;queued=false;}
         vy=Mathf.Max(vy-8*Time.fixedDeltaTime,-2.7f);
         var p=body.position+new Vector2(Input.GetAxisRaw("Horizontal")*4,vy)*Time.fixedDeltaTime;
-        p.y=Mathf.Clamp(p.y,1.1f,10.5f);p.x=Mathf.Clamp(p.x,.7f,115);
+        p.y=Mathf.Clamp(p.y,1.1f,10.5f);p.x=Mathf.Clamp(p.x,.7f,159);
         body.MovePosition(p);
     }
 }
