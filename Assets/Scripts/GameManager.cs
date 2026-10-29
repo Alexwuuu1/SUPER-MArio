@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public int lives { get; private set; }
     public int coins { get; private set; }
     public int score { get; private set; }
+    public int unlockedStage { get; private set; } = 1;
     public float timeRemaining { get; private set; } = 400f;
     public bool playing => SceneManager.GetActiveScene().name.StartsWith("1-");
 
@@ -42,8 +43,9 @@ public class GameManager : MonoBehaviour
         lives = 3;
         coins = 0;
         score = 0;
-
-        LoadLevel(1, 1);
+        unlockedStage = 1;
+        stage = 1;
+        SceneManager.LoadScene("Map");
     }
 
     public void GameOver()
@@ -63,7 +65,7 @@ public class GameManager : MonoBehaviour
     public void NextLevel()
     {
         if (stage >= 4) SceneManager.LoadScene("Victory");
-        else LoadLevel(world, stage + 1);
+        else { unlockedStage = Mathf.Max(unlockedStage,stage+1); stage++; SceneManager.LoadScene("Map"); }
     }
 
     public void ResetLevel(float delay)

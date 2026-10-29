@@ -32,7 +32,7 @@ public class FlagPole : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        GameManager.Instance.LoadLevel(nextWorld, nextStage);
+        GameManager.Instance.NextLevel();
     }
 
     private IEnumerator MoveTo(Transform subject, Vector3 position)

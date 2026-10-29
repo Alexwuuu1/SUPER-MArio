@@ -128,14 +128,14 @@ public static class MarioSetup
         EditorSceneManager.OpenScene("Assets/Scenes/1-1.unity");
         foreach(var flag in UnityEngine.Object.FindObjectsByType<FlagPole>(FindObjectsSortMode.None)){flag.nextWorld=1;flag.nextStage=2;EditorUtility.SetDirty(flag);}
         EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
-        foreach(string name in new[]{"Menu","GameOver","Victory"}){
+        foreach(string name in new[]{"Menu","Map","GameOver","Victory"}){
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);root=new GameObject("Decoracion");
             var c=new GameObject("Main Camera");c.tag="MainCamera";var cam=c.AddComponent<Camera>();cam.orthographic=true;cam.orthographicSize=7;cam.backgroundColor=name=="Menu"?new Color(.13f,.3f,.55f):new Color(.025f,.03f,.07f);c.transform.position=new Vector3(12,6,-10);c.AddComponent<AudioListener>();
             Floor("GroundBlock",-3,32);Tile("Hill1",5,2,7,4,null,false);Tile("Castle",24,3,5,5,null,false);
             if(name=="Menu"){var manager=new GameObject("Game Manager");manager.AddComponent<GameManager>();manager.AddComponent<MarioScreen>();manager.AddComponent<MarioAudio>();}
             EditorSceneManager.SaveScene(SceneManager.GetActiveScene(),"Assets/Scenes/"+name+".unity");
         }
-        var names=new[]{"Menu","1-1","1-2","1-3","1-4","GameOver","Victory"};
+        var names=new[]{"Menu","Map","1-1","1-2","1-3","1-4","GameOver","Victory"};
         EditorBuildSettings.scenes=names.Select(n=>new EditorBuildSettingsScene("Assets/Scenes/"+n+".unity",true)).ToArray();
         PlayerSettings.companyName="Alexwuuu1";PlayerSettings.productName="Super Mario - La Forja de Bowser";
         PlayerSettings.defaultScreenWidth=1280;PlayerSettings.defaultScreenHeight=720;PlayerSettings.fullScreenMode=FullScreenMode.Windowed;
