@@ -75,7 +75,6 @@ public class PlayerMovement : MonoBehaviour
     private void HorizontalMovement()
     {
         // accelerate / decelerate
-        inputAxis = Input.GetAxis("Horizontal");
         inputAxis = Input.GetAxisRaw("Horizontal");
         velocity.x = Mathf.MoveTowards(velocity.x, inputAxis * moveSpeed, 55f * Time.deltaTime);
 
