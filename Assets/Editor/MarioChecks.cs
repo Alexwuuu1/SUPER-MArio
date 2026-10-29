@@ -54,7 +54,8 @@ public static class MarioChecks
                 case 13:Require(gm.lives==2,"primera muerte resta una vida");gm.ResetLevel();break;
                 case 14:Require(gm.lives==1,"segunda muerte resta una vida");gm.ResetLevel();break;
                 case 15:Require(gm.lives==0&&SceneManager.GetActiveScene().name=="GameOver","game over tras perder todas las vidas");gm.NewGame();break;
-                case 16:Require(gm.lives==3&&gm.coins==0&&gm.score==0&&gm.unlockedStage==1,"reinicio limpio de partida");Finish();break;
+                case 16:Require(gm.lives==3&&gm.coins==0&&gm.score==0&&gm.unlockedStage==1,"reinicio limpio de partida");gm.StartTestLevel(4);break;
+                case 17:Require(gm.lives==3&&gm.testingLevel&&gm.unlockedStage==4&&SceneManager.GetActiveScene().name=="1-4","selector abre castillo directamente con tres vidas");Finish();break;
             }
         }catch(Exception e){failed=true;Debug.LogError("CHECK_FAILED: "+e);Finish();}
     }
