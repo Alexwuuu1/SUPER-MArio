@@ -52,6 +52,8 @@ public class Koopa : MonoBehaviour
 
     private void EnterShell()
     {
+        GameManager.Instance.AddScore(100);
+        MarioAudio.Play("stomp");
         shelled = true;
 
         GetComponent<SpriteRenderer>().sprite = shellSprite;
@@ -75,6 +77,9 @@ public class Koopa : MonoBehaviour
 
     private void Hit()
     {
+        if (GetComponent<DeathAnimation>().enabled) return;
+        GameManager.Instance.AddScore(200);
+        MarioAudio.Play("stomp");
         GetComponent<AnimatedSprite>().enabled = false;
         GetComponent<DeathAnimation>().enabled = true;
         Destroy(gameObject, 3f);

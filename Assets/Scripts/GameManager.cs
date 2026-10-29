@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour
     {
         if (!playing) return;
         var player = FindFirstObjectByType<Player>();
-        if (player == null || player.dead || !player.GetComponent<PlayerMovement>().enabled) return;
+        if (player == null || player.dead || (!player.GetComponent<PlayerMovement>().enabled && player.GetComponent<WaterMotion>() == null)) return;
         timeRemaining = Mathf.Max(0, timeRemaining - Time.deltaTime);
         if (timeRemaining <= 0) player.Death();
     }

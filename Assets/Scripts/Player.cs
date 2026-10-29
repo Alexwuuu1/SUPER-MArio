@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     public bool big => bigRenderer.enabled;
     public bool dead => deathAnimation.enabled;
     public bool starpower { get; private set; }
+    private float invulnerableUntil;
 
     private void Awake()
     {
@@ -23,8 +24,9 @@ public class Player : MonoBehaviour
 
     public void Hit()
     {
-        if (!dead && !starpower)
+        if (!dead && !starpower && Time.time >= invulnerableUntil)
         {
+            invulnerableUntil = Time.time + 1.5f;
             if (big) {
                 Shrink();
             } else {
@@ -35,6 +37,8 @@ public class Player : MonoBehaviour
 
     public void Death()
     {
+        if (dead) return;
+        MarioAudio.Play("death");
         smallRenderer.enabled = false;
         bigRenderer.enabled = false;
         deathAnimation.enabled = true;
@@ -44,6 +48,7 @@ public class Player : MonoBehaviour
 
     public void Grow()
     {
+        MarioAudio.Play("powerup");
         smallRenderer.enabled = false;
         bigRenderer.enabled = true;
         activeRenderer = bigRenderer;
@@ -56,6 +61,7 @@ public class Player : MonoBehaviour
 
     public void Shrink()
     {
+        MarioAudio.Play("damage");
         smallRenderer.enabled = true;
         bigRenderer.enabled = false;
         activeRenderer = smallRenderer;
@@ -91,6 +97,7 @@ public class Player : MonoBehaviour
 
     public void Starpower()
     {
+        MarioAudio.Play("powerup");
         StartCoroutine(StarpowerAnimation());
     }
 

@@ -29,6 +29,8 @@ public class Goomba : MonoBehaviour
 
     private void Flatten()
     {
+        GameManager.Instance.AddScore(100);
+        MarioAudio.Play("stomp");
         GetComponent<Collider2D>().enabled = false;
         GetComponent<EntityMovement>().enabled = false;
         GetComponent<AnimatedSprite>().enabled = false;
@@ -38,6 +40,9 @@ public class Goomba : MonoBehaviour
 
     private void Hit()
     {
+        if (GetComponent<DeathAnimation>().enabled) return;
+        GameManager.Instance.AddScore(100);
+        MarioAudio.Play("stomp");
         GetComponent<AnimatedSprite>().enabled = false;
         GetComponent<DeathAnimation>().enabled = true;
         Destroy(gameObject, 3f);
