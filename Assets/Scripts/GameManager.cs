@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
     public int stage { get; private set; }
     public int lives { get; private set; }
     public int coins { get; private set; }
+    public int score { get; private set; }
+    public float timeRemaining { get; private set; } = 400f;
+    public bool playing => SceneManager.GetActiveScene().name.StartsWith("1-");
 
     private void Awake()
     {
@@ -31,35 +34,36 @@ public class GameManager : MonoBehaviour
     {
         Application.targetFrameRate = 60;
 
-        NewGame();
+        if (playing) { lives = 3; world = 1; stage = 1; }
     }
 
     public void NewGame()
     {
         lives = 3;
         coins = 0;
+        score = 0;
 
         LoadLevel(1, 1);
     }
 
     public void GameOver()
     {
-        // TODO: show game over screen
-
-        NewGame();
+        SceneManager.LoadScene("GameOver");
     }
 
     public void LoadLevel(int world, int stage)
     {
         this.world = world;
         this.stage = stage;
+        timeRemaining = 400f;
 
         SceneManager.LoadScene($"{world}-{stage}");
     }
 
     public void NextLevel()
     {
-        LoadLevel(world, stage + 1);
+        if (stage >= 4) SceneManager.LoadScene("Victory");
+        else LoadLevel(world, stage + 1);
     }
 
     public void ResetLevel(float delay)
@@ -82,6 +86,8 @@ public class GameManager : MonoBehaviour
     public void AddCoin()
     {
         coins++;
+        AddScore(200);
+        MarioAudio.Play("coin");
 
         if (coins == 100)
         {
@@ -93,6 +99,17 @@ public class GameManager : MonoBehaviour
     public void AddLife()
     {
         lives++;
+    }
+
+    public void AddScore(int points) { score += points; }
+
+    private void Update()
+    {
+        if (!playing) return;
+        var player = FindFirstObjectByType<Player>();
+        if (player == null || player.dead || !player.GetComponent<PlayerMovement>().enabled) return;
+        timeRemaining = Mathf.Max(0, timeRemaining - Time.deltaTime);
+        if (timeRemaining <= 0) player.Death();
     }
 
 }
