@@ -29,7 +29,7 @@ La distribución del subterráneo y del acuático se reconstruyó tomando como r
 
 Referencias de distribución: [World 1-2](https://www.nesmaps.com/maps/SuperMarioBrothers/SuperMarioBrosWorld1-2Map.html) y [World 2-2](https://www.nesmaps.com/maps/SuperMarioBrothers/SuperMarioBrosWorld2-2Map.html), mapas de Rick N. Bruns / NESMaps.
 
-El ejecutable se generará después de revisar la jugabilidad.
+Ejecutable de Windows de 64 bits generado y entregado en **SuperMario-Windows.zip**. Extraer toda la carpeta antes de abrir `SuperMario.exe`; conservar junto al ejecutable sus carpetas de datos y las bibliotecas incluidas.
 
 ## Proyecto base y créditos
 
