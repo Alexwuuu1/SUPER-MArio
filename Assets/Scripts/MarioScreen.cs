@@ -5,12 +5,15 @@ public class MarioScreen : MonoBehaviour
 {
     private GUIStyle title, text, button, hud;
     private int selection;
+    private bool selectingLevel;
     private string Scene => SceneManager.GetActiveScene().name;
     private void Update()
     {
+        if (selectingLevel) { if(Input.GetKeyDown(KeyCode.Escape))selectingLevel=false;return; }
         if (Scene == "Menu") {
-            if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.UpArrow)) { selection = 1-selection; MarioAudio.Play("coin"); }
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)) GameManager.Instance.NewGame();
+            if (Input.GetKeyDown(KeyCode.DownArrow)) { selection = (selection+1)%3; MarioAudio.Play("coin"); }
+            if (Input.GetKeyDown(KeyCode.UpArrow)) { selection = (selection+2)%3; MarioAudio.Play("coin"); }
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)) { if(selection==2)selectingLevel=true;else GameManager.Instance.NewGame(); }
         } else if (Scene=="Map") {
             if (Input.GetKeyDown(KeyCode.Return)) GameManager.Instance.LoadLevel(1,GameManager.Instance.stage);
         } else if (!GameManager.Instance.playing && Input.GetKeyDown(KeyCode.Return)) GameManager.Instance.NewGame();
@@ -29,6 +32,7 @@ public class MarioScreen : MonoBehaviour
         }
         var gm=GameManager.Instance;
         if (gm == null) return;
+        if (selectingLevel) { DrawSelector(gm); return; }
         if (Scene=="Map") { DrawMap(gm); return; }
         if (gm.playing) {
             GUI.color=new Color(0,0,0,.8f); GUI.DrawTexture(new Rect(0,0,960,58),Texture2D.whiteTexture); GUI.color=Color.white;
@@ -37,19 +41,29 @@ public class MarioScreen : MonoBehaviour
             GUI.Label(new Rect(500,10,200,45),$"WORLD  {gm.world}-{gm.stage}",hud);
             GUI.Label(new Rect(730,10,220,45),$"TIME {(int)gm.timeRemaining:000}  x{gm.lives}",hud);
             if (Time.timeSinceLevelLoad < 3) GUI.Label(new Rect(0,80,960,35),gm.stage==2 ? "1-2  /  SUBTERRANEO" : gm.stage==3 ? "1-3  /  PROFUNDIDADES  -  ESPACIO PARA NADAR" : gm.stage==4 ? "1-4  /  LA FORJA DE BOWSER" : "1-1  /  REINO CHAMPINON",text);
+            if(gm.testingLevel)GUI.Label(new Rect(20,495,500,30),"MODO PRUEBAS  -  NIVEL SELECCIONADO",hud);
             return;
         }
         GUI.Label(new Rect(60,90,840,100),Scene=="Menu" ? "SUPER MARIO" : Scene=="GameOver" ? "GAME OVER" : "REINO SALVADO",title);
         GUI.Label(new Rect(80,190,800,45),Scene=="Menu" ? "UNA AVENTURA A TRAVES DEL REINO" : $"PUNTAJE FINAL  {gm.score:000000}",text);
         if (Scene=="Menu") {
-            if(GUI.Button(new Rect(295,275,370,58),(selection==0 ? ">  " : "")+"1 JUGADOR",button)) gm.NewGame();
-            if(GUI.Button(new Rect(295,347,370,58),(selection==1 ? ">  " : "")+"COMENZAR AVENTURA",button)) gm.NewGame();
-            GUI.Label(new Rect(70,440,820,40),"A / D o flechas: mover     ESPACIO: saltar / nadar",text);
+            if(GUI.Button(new Rect(295,245,370,54),(selection==0 ? ">  " : "")+"1 JUGADOR",button)) gm.NewGame();
+            if(GUI.Button(new Rect(295,310,370,54),(selection==1 ? ">  " : "")+"COMENZAR AVENTURA",button)) gm.NewGame();
+            if(GUI.Button(new Rect(295,375,370,54),(selection==2 ? ">  " : "")+"SELECTOR DE NIVELES",button)) selectingLevel=true;
+            GUI.Label(new Rect(70,448,820,40),"A / D o flechas: mover     ESPACIO: saltar / nadar",text);
         } else {
             if(GUI.Button(new Rect(295,280,370,58),"VOLVER A JUGAR",button)) gm.NewGame();
             if(GUI.Button(new Rect(295,350,370,58),"MENU PRINCIPAL",button)) SceneManager.LoadScene("Menu");
         }
         GUI.Label(new Rect(70,495,820,30),"ENTER PARA COMENZAR",text);
+    }
+
+    private void DrawSelector(GameManager gm) {
+        GUI.Label(new Rect(0,40,960,85),"SELECTOR DE NIVELES",title);
+        GUI.Label(new Rect(0,125,960,40),"PRUEBA CUALQUIER ESCENARIO CON 3 VIDAS",text);
+        string[] names={"1-1  SUPERFICIE","1-2  SUBTERRANEO","1-3  ACUATICO","1-4  FORJA DE BOWSER"};
+        for(int i=0;i<4;i++)if(GUI.Button(new Rect(105+(i%2)*390,205+(i/2)*95,360,72),names[i],button)){selectingLevel=false;gm.StartTestLevel(i+1);}
+        if(GUI.Button(new Rect(330,435,300,52),"VOLVER",button))selectingLevel=false;
     }
 
     private void DrawMap(GameManager gm) {
@@ -70,5 +84,6 @@ public class MarioScreen : MonoBehaviour
         }
         GUI.Label(new Rect(0,425,960,40),$"VIDAS  {gm.lives}     MONEDAS  {gm.coins:00}     PUNTAJE  {gm.score:000000}",text);
         GUI.Label(new Rect(0,485,960,35),"HAZ CLIC EN UN NIVEL DESBLOQUEADO  /  ENTER PARA CONTINUAR",text);
+        if(GUI.Button(new Rect(670,420,245,45),"PROBAR NIVELES",button))selectingLevel=true;
     }
 }
