@@ -31,6 +31,17 @@ Referencias de distribución: [World 1-2](https://www.nesmaps.com/maps/SuperMari
 
 Ejecutable de Windows de 64 bits generado y entregado en **SuperMario-Windows.zip**. Extraer toda la carpeta antes de abrir `SuperMario.exe`; conservar junto al ejecutable sus carpetas de datos y las bibliotecas incluidas.
 
+## Colaboradores del equipo
+
+| Integrante | Aporte |
+| --- | --- |
+| [Alexwuuu1](https://github.com/Alexwuuu1) | Corrección de colisiones, mejoras del salto y seguimiento de cámara. |
+| [Galileya](https://github.com/Galileya) | Menú principal, menú de pausa, controles y ajustes de audio. |
+| [lpzealexjoelquispeti-dot](https://github.com/lpzealexjoelquispeti-dot) | Mapa del mundo, sprites, selección de niveles y progreso. |
+| [Crisshubb](https://github.com/Crisshubb) | Flor de fuego, proyectiles, colisiones y puntaje al eliminar enemigos. |
+
+Los aportes se desarrollaron en ramas `feature/` y se integraron en `develop` y `main`.
+
 ## Proyecto base y créditos
 
 Fork de [Jesusbautistah/SUPER-MArio](https://github.com/Jesusbautistah/SUPER-MArio), basado en el tutorial de Zigurous. Se conserva a continuación la información del proyecto original. Mario y sus elementos pertenecen a Nintendo; proyecto educativo.
