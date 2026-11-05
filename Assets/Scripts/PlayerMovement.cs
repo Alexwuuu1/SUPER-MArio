@@ -12,6 +12,10 @@ public class PlayerMovement : MonoBehaviour
     private readonly ContactPoint2D[] contacts = new ContactPoint2D[24];
     private ContactFilter2D terrainFilter;
     private LevelCamera levelCamera;
+    [Range(0f, .25f)] public float coyoteTime = .1f;
+    [Range(0f, .25f)] public float jumpBuffer = .12f;
+    private float groundGrace, bufferedJump;
+    private bool jumpConsumed;
 
     public float moveSpeed = 8f;
     public float maxJumpHeight = 5f;
@@ -40,6 +44,8 @@ public class PlayerMovement : MonoBehaviour
         collider.enabled = true;
         velocity = Vector2.zero;
         jumping = false;
+        groundGrace = bufferedJump = 0;
+        jumpConsumed = false;
     }
 
     private void OnDisable()
@@ -52,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if(Time.timeScale==0)return;
         ProcessInput(Input.GetAxisRaw("Horizontal"), Input.GetButtonDown("Jump"), Input.GetButton("Jump"), Time.deltaTime);
     }
 
@@ -63,7 +70,15 @@ public class PlayerMovement : MonoBehaviour
             if (contacts[i].normal.y > 0.65f && contacts[i].point.y < collider.bounds.center.y) grounded = true;
         }
         HorizontalMovement(axis, deltaTime);
-        if (grounded) GroundedMovement(jumpPressed);
+        if (grounded && velocity.y <= 0) jumpConsumed = false;
+        groundGrace = grounded && !jumpConsumed ? coyoteTime : Mathf.Max(0, groundGrace - deltaTime);
+        bufferedJump = jumpPressed ? jumpBuffer : Mathf.Max(0, bufferedJump - deltaTime);
+        if (grounded && velocity.y < 0) velocity.y = 0;
+        if (bufferedJump > 0 && groundGrace > 0 && !jumpConsumed) {
+            GroundedMovement(true);
+            jumpConsumed = true;
+            groundGrace = bufferedJump = 0;
+        }
         ApplyGravity(jumpHeld, deltaTime);
     }
 

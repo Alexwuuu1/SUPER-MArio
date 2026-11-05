@@ -60,13 +60,33 @@ public static class PlayerCollisionChecks
         }
         UnityEngine.Object.DestroyImmediate(mario); UnityEngine.Object.DestroyImmediate(fixture);
     }
+    private static void AssistedJumpCases() {
+        var fixture=new GameObject("Assisted jump regression");Box(fixture.transform,new Vector2(520,0),new Vector2(10,1));
+        var mario=UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Mario.prefab"),new Vector3(520,1.03f),Quaternion.identity);
+        var motor=mario.GetComponent<PlayerMovement>();var body=mario.GetComponent<Rigidbody2D>();
+        var input=typeof(PlayerMovement).GetMethod("ProcessInput",BindingFlags.Instance|BindingFlags.NonPublic);
+        var move=typeof(PlayerMovement).GetMethod("FixedUpdate",BindingFlags.Instance|BindingFlags.NonPublic);
+        var v=typeof(PlayerMovement).GetField("velocity",BindingFlags.Instance|BindingFlags.NonPublic);
+        Action<bool> tick=pressed=>{input.Invoke(motor,new object[]{0f,pressed,true,.02f});move.Invoke(motor,null);Physics2D.Simulate(.02f);};
+        for(int i=0;i<15;i++)tick(false);
+        body.position=new Vector2(540,1.03f);Physics2D.SyncTransforms();Physics2D.Simulate(.02f);tick(false);tick(true);
+        Require(((Vector2)v.GetValue(motor)).y>0,"salto permitido al dejar el borde");
+        for(int i=0;i<8;i++)tick(false);tick(true);
+        Require(((Vector2)v.GetValue(motor)).y<motor.jumpForce-2,"sin segundo salto en el aire");
+        UnityEngine.Object.DestroyImmediate(mario);
+        mario=UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Mario.prefab"),new Vector3(520,1.35f),Quaternion.identity);
+        motor=mario.GetComponent<PlayerMovement>();body=mario.GetComponent<Rigidbody2D>();v.SetValue(motor,new Vector2(0,-4));Physics2D.SyncTransforms();
+        tick(true);bool buffered=false;for(int i=0;i<8;i++){tick(false);if(((Vector2)v.GetValue(motor)).y>5)buffered=true;}
+        Require(buffered,"pulsacion antes de aterrizar produce salto");
+        UnityEngine.Object.DestroyImmediate(mario);UnityEngine.Object.DestroyImmediate(fixture);
+    }
     private static void Test() {
         if(EditorApplication.timeSinceStartup < ready) return;
         EditorApplication.update -= Test;
         var oldMode = Physics2D.simulationMode;
         try {
             Physics2D.simulationMode = SimulationMode2D.Script;
-            Case(false, 1); Case(false, -1); Case(true, 1); Case(true, -1); Case(true, 0, true);
+            Case(false, 1); Case(false, -1); Case(true, 1); Case(true, -1); Case(true, 0, true); AssistedJumpCases();
             File.WriteAllText("../mario-colisiones-verificacion.txt", "PASS - saltos a ambos lados, Mario pequeno y grande, y techo real");
             Debug.Log("PLAYER_COLLISION_CHECKS_OK");
         } catch(Exception e) {
