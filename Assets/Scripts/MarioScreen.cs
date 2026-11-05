@@ -11,6 +11,7 @@ public class MarioScreen : MonoBehaviour
     private string Scene => SceneManager.GetActiveScene().name;
     private void Update()
     {
+        if(MarioPauseMenu.IsPaused)return;
         if (selectingLevel) { if(Input.GetKeyDown(KeyCode.Escape))selectingLevel=false;return; }
         if (Scene == "Menu") {
             if (Input.GetKeyDown(KeyCode.DownArrow)) { selection = (selection+1)%2; MarioAudio.Play("coin"); }
