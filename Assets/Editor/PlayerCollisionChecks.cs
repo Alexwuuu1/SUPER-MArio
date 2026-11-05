@@ -80,6 +80,33 @@ public static class PlayerCollisionChecks
         Require(buffered,"pulsacion antes de aterrizar produce salto");
         UnityEngine.Object.DestroyImmediate(mario);UnityEngine.Object.DestroyImmediate(fixture);
     }
+    private static void LandingAnimationCase(bool big) {
+        var fixture = new GameObject("Landing animation regression");
+        Box(fixture.transform, new Vector2(520, 0), new Vector2(24, 1));
+        var mario = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Mario.prefab"), new Vector3(520, 1.03f), Quaternion.identity);
+        var player = mario.GetComponent<Player>();
+        if (big) player.Grow();
+        var motor = mario.GetComponent<PlayerMovement>();
+        var renderer = big ? player.bigRenderer : player.smallRenderer;
+        var input = typeof(PlayerMovement).GetMethod("ProcessInput", BindingFlags.Instance | BindingFlags.NonPublic);
+        var move = typeof(PlayerMovement).GetMethod("FixedUpdate", BindingFlags.Instance | BindingFlags.NonPublic);
+        var draw = typeof(PlayerSpriteRenderer).GetMethod("LateUpdate", BindingFlags.Instance | BindingFlags.NonPublic);
+        Action<float, bool> tick = (axis, pressed) => {
+            input.Invoke(motor, new object[] { axis, pressed, pressed, .02f });
+            move.Invoke(motor, null);
+            Physics2D.Simulate(.02f);
+            draw.Invoke(renderer, null);
+        };
+        for (int i = 0; i < 15; i++) tick(0, false);
+        tick(0, true);
+        Require(motor.jumping && renderer.spriteRenderer.sprite == renderer.jump && !renderer.run.enabled, "pose de salto sin animacion de carrera en el aire");
+        for (int i = 0; i < 100; i++) tick(0, false);
+        Require(motor.grounded && !motor.jumping && renderer.spriteRenderer.sprite == renderer.idle, "Mario " + (big ? "grande" : "pequeno") + " vuelve a reposo tras aterrizar");
+        for (int i = 0; i < 5; i++) tick(1, false);
+        Require(!motor.jumping && renderer.run.enabled, "Mario vuelve a correr despues del salto");
+        UnityEngine.Object.DestroyImmediate(mario);
+        UnityEngine.Object.DestroyImmediate(fixture);
+    }
     private static void Test() {
         if(EditorApplication.timeSinceStartup < ready) return;
         EditorApplication.update -= Test;
@@ -87,6 +114,7 @@ public static class PlayerCollisionChecks
         try {
             Physics2D.simulationMode = SimulationMode2D.Script;
             Case(false, 1); Case(false, -1); Case(true, 1); Case(true, -1); Case(true, 0, true); AssistedJumpCases();
+            LandingAnimationCase(false); LandingAnimationCase(true);
             File.WriteAllText("../mario-colisiones-verificacion.txt", "PASS - saltos a ambos lados, Mario pequeno y grande, y techo real");
             Debug.Log("PLAYER_COLLISION_CHECKS_OK");
         } catch(Exception e) {

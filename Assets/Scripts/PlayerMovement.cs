@@ -70,7 +70,10 @@ public class PlayerMovement : MonoBehaviour
             if (contacts[i].normal.y > 0.65f && contacts[i].point.y < collider.bounds.center.y) grounded = true;
         }
         HorizontalMovement(axis, deltaTime);
-        if (grounded && velocity.y <= 0) jumpConsumed = false;
+        if (grounded && velocity.y <= 0) {
+            jumpConsumed = false;
+            jumping = false;
+        }
         groundGrace = grounded && !jumpConsumed ? coyoteTime : Mathf.Max(0, groundGrace - deltaTime);
         bufferedJump = jumpPressed ? jumpBuffer : Mathf.Max(0, bufferedJump - deltaTime);
         if (grounded && velocity.y < 0) velocity.y = 0;

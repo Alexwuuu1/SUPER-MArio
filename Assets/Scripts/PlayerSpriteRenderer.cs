@@ -23,9 +23,10 @@ public class PlayerSpriteRenderer : MonoBehaviour
             spriteRenderer.sprite = Mathf.Sin(Time.time * 10f) > 0 ? jump : idle;
             return;
         }
-        run.enabled = movement.running;
+        bool airborne = movement.jumping || movement.falling;
+        run.enabled = movement.running && !airborne && !movement.sliding;
 
-        if (movement.jumping) {
+        if (airborne) {
             spriteRenderer.sprite = jump;
         } else if (movement.sliding) {
             spriteRenderer.sprite = slide;
