@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Goomba : MonoBehaviour
 {
+    private bool defeated;
     public Sprite flatSprite;
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -29,6 +30,7 @@ public class Goomba : MonoBehaviour
 
     private void Flatten()
     {
+        if(defeated)return;defeated=true;
         GameManager.Instance.AddScore(100);
         MarioAudio.Play("stomp");
         GetComponent<Collider2D>().enabled = false;
@@ -38,9 +40,12 @@ public class Goomba : MonoBehaviour
         Destroy(gameObject, 0.5f);
     }
 
+    public void HitByFire() { Hit(); }
+
     private void Hit()
     {
-        if (GetComponent<DeathAnimation>().enabled) return;
+        if (defeated || GetComponent<DeathAnimation>().enabled) return;
+        defeated=true;
         GameManager.Instance.AddScore(100);
         MarioAudio.Play("stomp");
         GetComponent<AnimatedSprite>().enabled = false;

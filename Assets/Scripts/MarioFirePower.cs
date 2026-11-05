@@ -32,8 +32,8 @@ public class MarioFirePower : MonoBehaviour
     public void Grant(){if(player.dead)return;if(!player.big)player.Grow();active=true;MarioAudio.Play("powerup");}
     public bool TryShoot(int direction){
         balls.RemoveAll(ball=>ball==null);
-        if(!active||player.dead||Time.timeScale==0||!player.GetComponent<PlayerMovement>().enabled||Time.time<nextShot||balls.Count>=2)return false;
-        balls.Add(MarioFireball.Launch(player,direction<0?-1:1));nextShot=Time.time+.25f;MarioAudio.Play("jump");return true;
+        if(!active||player.dead||Time.timeScale==0||(!player.GetComponent<PlayerMovement>().enabled&&player.GetComponent<WaterMotion>()==null)||Time.time<nextShot||balls.Count>=2)return false;
+        balls.Add(MarioFireball.Launch(player,direction<0?-1:1));nextShot=Time.time+.25f;MarioAudio.Play("fire");return true;
     }
     private void Update(){if(Input.GetKeyDown(KeyCode.X))TryShoot(transform.eulerAngles.y>90?-1:1);}
     private void LateUpdate(){

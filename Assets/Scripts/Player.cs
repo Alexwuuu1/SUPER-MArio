@@ -10,10 +10,11 @@ public class Player : MonoBehaviour
     public CapsuleCollider2D capsuleCollider { get; private set; }
     public DeathAnimation deathAnimation { get; private set; }
 
-    public bool big => bigRenderer.enabled;
+    public bool big => large;
     public bool dead => deathAnimation.enabled;
     public bool starpower { get; private set; }
     private float invulnerableUntil;
+    private bool large;
 
     private void Awake()
     {
@@ -28,6 +29,8 @@ public class Player : MonoBehaviour
         if (!dead && !starpower && Time.time >= invulnerableUntil)
         {
             invulnerableUntil = Time.time + 1.5f;
+            var fire=GetComponent<MarioFirePower>();
+            if(fire!=null && fire.active){fire.Lose();MarioAudio.Play("damage");return;}
             if (big) {
                 Shrink();
             } else {
@@ -49,6 +52,7 @@ public class Player : MonoBehaviour
 
     public void Grow()
     {
+        large=true;
         MarioAudio.Play("powerup");
         smallRenderer.enabled = false;
         bigRenderer.enabled = true;
@@ -62,6 +66,7 @@ public class Player : MonoBehaviour
 
     public void Shrink()
     {
+        large=false;
         MarioAudio.Play("damage");
         smallRenderer.enabled = true;
         bigRenderer.enabled = false;

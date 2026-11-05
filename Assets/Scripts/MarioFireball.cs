@@ -33,6 +33,6 @@ public class MarioFireball : MonoBehaviour
         var enemy=hit.GetComponent<Goomba>();var koopa=hit.GetComponent<Koopa>();
         if(enemy!=null||koopa!=null)ImpactEnemy(enemy,koopa);
     }
-    private void ImpactEnemy(Goomba goomba,Koopa koopa){Spend();}
+    private void ImpactEnemy(Goomba goomba,Koopa koopa){if(spent)return;if(goomba!=null)goomba.HitByFire();if(koopa!=null)koopa.HitByFire();MarioAudio.Play("impact");Spend();}
     private void Spend(){if(spent)return;spent=true;Destroy(gameObject);}
 }
