@@ -9,6 +9,7 @@ public class WaterMotion : MonoBehaviour
     public float end=192;
     private void Start(){movement=GetComponent<PlayerMovement>();movement.enabled=false;body=GetComponent<Rigidbody2D>();body.bodyType=RigidbodyType2D.Dynamic;GetComponent<Collider2D>().enabled=true;}
     private void Update(){
+        if(Time.timeScale==0)return;
         if(GetComponent<Player>().dead)return;
         if(Input.GetButtonDown("Jump")){queued=true;MarioAudio.Play("jump");}
         float axis=Input.GetAxisRaw("Horizontal");if(axis!=0)transform.eulerAngles=new Vector3(0,axis<0?180:0,0);

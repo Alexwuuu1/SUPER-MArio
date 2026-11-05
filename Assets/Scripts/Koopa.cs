@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Koopa : MonoBehaviour
 {
+    private bool defeated;
     public Sprite shellSprite;
     public float shellSpeed = 12f;
 
@@ -75,9 +76,12 @@ public class Koopa : MonoBehaviour
         gameObject.layer = LayerMask.NameToLayer("Shell");
     }
 
+    public void HitByFire() { Hit(); }
+
     private void Hit()
     {
-        if (GetComponent<DeathAnimation>().enabled) return;
+        if (defeated || GetComponent<DeathAnimation>().enabled) return;
+        defeated=true;
         GameManager.Instance.AddScore(200);
         MarioAudio.Play("stomp");
         GetComponent<AnimatedSprite>().enabled = false;
