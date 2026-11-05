@@ -5,7 +5,8 @@ public class MarioFirePower : MonoBehaviour
 {
     public bool active { get; private set; }
     private Player player;
-    private bool wasBig;
+    private float nextShot;
+    private readonly System.Collections.Generic.List<MarioFireball> balls=new System.Collections.Generic.List<MarioFireball>();
     private void Awake(){player=GetComponent<Player>();}
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Install(){SceneManager.sceneLoaded-=Loaded;SceneManager.sceneLoaded+=Loaded;Loaded(SceneManager.GetActiveScene(),LoadSceneMode.Single);}
@@ -28,11 +29,16 @@ public class MarioFirePower : MonoBehaviour
         var go=new GameObject("Flor de fuego");var sr=go.AddComponent<SpriteRenderer>();sr.sprite=FireFlowerPickup.FlowerSprite;sr.sortingOrder=4;
         go.AddComponent<BoxCollider2D>().isTrigger=true;go.AddComponent<FireFlowerPickup>();return go;
     }
-    public void Grant(){if(player.dead)return;if(!player.big)player.Grow();active=true;wasBig=true;MarioAudio.Play("powerup");}
+    public void Grant(){if(player.dead)return;if(!player.big)player.Grow();active=true;MarioAudio.Play("powerup");}
+    public bool TryShoot(int direction){
+        balls.RemoveAll(ball=>ball==null);
+        if(!active||player.dead||Time.timeScale==0||!player.GetComponent<PlayerMovement>().enabled||Time.time<nextShot||balls.Count>=2)return false;
+        balls.Add(MarioFireball.Launch(player,direction<0?-1:1));nextShot=Time.time+.25f;MarioAudio.Play("jump");return true;
+    }
+    private void Update(){if(Input.GetKeyDown(KeyCode.X))TryShoot(transform.eulerAngles.y>90?-1:1);}
     private void LateUpdate(){
         if(!active)return;
-        if(player.dead||!player.big){Lose();return;}
-        wasBig=player.big;
+        if(player.dead||player.capsuleCollider.size.y<1.5f){Lose();return;}
         if(!player.starpower)player.bigRenderer.spriteRenderer.color=new Color(1,.65f,.35f);
     }
     public void Lose(){active=false;if(player!=null&&player.bigRenderer.spriteRenderer!=null)player.bigRenderer.spriteRenderer.color=Color.white;}
@@ -54,6 +60,7 @@ public class FireFlowerPickup : MonoBehaviour
     private Vector3 origin;
     private bool collected;
     private void Awake(){born=Time.time;origin=transform.position;}
+    private void Start(){born=Time.time;origin=transform.position;}
     private void OnEnable(){born=Time.time;origin=transform.position;}
     private void Update(){transform.position=origin+Vector3.up*Mathf.SmoothStep(0,1,Mathf.Clamp01((Time.time-born)/.45f));}
     private void OnTriggerEnter2D(Collider2D other){Collect(other);}
