@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         capsuleCollider = GetComponent<CapsuleCollider2D>();
+        capsuleCollider.size = new Vector2(0.9f, capsuleCollider.size.y);
         deathAnimation = GetComponent<DeathAnimation>();
         activeRenderer = smallRenderer;
     }
@@ -53,7 +54,7 @@ public class Player : MonoBehaviour
         bigRenderer.enabled = true;
         activeRenderer = bigRenderer;
 
-        capsuleCollider.size = new Vector2(1f, 2f);
+        capsuleCollider.size = new Vector2(0.9f, 2f);
         capsuleCollider.offset = new Vector2(0f, 0.5f);
 
         StartCoroutine(ScaleAnimation());
@@ -66,7 +67,7 @@ public class Player : MonoBehaviour
         bigRenderer.enabled = false;
         activeRenderer = smallRenderer;
 
-        capsuleCollider.size = new Vector2(1f, 1f);
+        capsuleCollider.size = new Vector2(0.9f, 1f);
         capsuleCollider.offset = new Vector2(0f, 0f);
 
         StartCoroutine(ScaleAnimation());

@@ -9,6 +9,9 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 velocity;
     private float inputAxis;
+    private readonly ContactPoint2D[] contacts = new ContactPoint2D[24];
+    private ContactFilter2D terrainFilter;
+    private LevelCamera levelCamera;
 
     public float moveSpeed = 8f;
     public float maxJumpHeight = 5f;
@@ -27,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
         camera = Camera.main;
         rigidbody = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
+        terrainFilter = new ContactFilter2D { useLayerMask = true, layerMask = LayerMask.GetMask("Default"), useTriggers = false };
+        levelCamera = camera.GetComponent<LevelCamera>();
     }
 
     private void OnEnable()
@@ -47,15 +52,19 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        HorizontalMovement();
+        ProcessInput(Input.GetAxisRaw("Horizontal"), Input.GetButtonDown("Jump"), Input.GetButton("Jump"), Time.deltaTime);
+    }
 
-        grounded = rigidbody.Raycast(Vector2.down);
-
-        if (grounded) {
-            GroundedMovement();
+    private void ProcessInput(float axis, bool jumpPressed, bool jumpHeld, float deltaTime)
+    {
+        grounded = false;
+        int count = rigidbody.GetContacts(terrainFilter, contacts);
+        for (int i = 0; i < count; i++) {
+            if (contacts[i].normal.y > 0.65f && contacts[i].point.y < collider.bounds.center.y) grounded = true;
         }
-
-        ApplyGravity();
+        HorizontalMovement(axis, deltaTime);
+        if (grounded) GroundedMovement(jumpPressed);
+        ApplyGravity(jumpHeld, deltaTime);
     }
 
     private void FixedUpdate()
@@ -64,24 +73,17 @@ public class PlayerMovement : MonoBehaviour
         Vector2 position = rigidbody.position;
         position += velocity * Time.fixedDeltaTime;
 
-        // clamp within the screen bounds
-        Vector2 leftEdge = camera.ScreenToWorldPoint(Vector2.zero);
-        Vector2 rightEdge = camera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-        position.x = Mathf.Clamp(position.x, leftEdge.x + 0.5f, rightEdge.x - 0.5f);
+        // Camera smoothing must never push the player into a wall.
+        position.x = Mathf.Clamp(position.x, 0.5f, levelCamera != null ? levelCamera.end - 0.5f : float.PositiveInfinity);
 
         rigidbody.MovePosition(position);
     }
 
-    private void HorizontalMovement()
+    private void HorizontalMovement(float axis, float deltaTime)
     {
         // accelerate / decelerate
-        inputAxis = Input.GetAxisRaw("Horizontal");
-        velocity.x = Mathf.MoveTowards(velocity.x, inputAxis * moveSpeed, 55f * Time.deltaTime);
-
-        // check if running into a wall
-        if (rigidbody.Raycast(Vector2.right * velocity.x)) {
-            velocity.x = 0f;
-        }
+        inputAxis = axis;
+        velocity.x = Mathf.MoveTowards(velocity.x, inputAxis * moveSpeed, 55f * deltaTime);
 
         // flip sprite to face direction
         if (velocity.x > 0f) {
@@ -91,14 +93,14 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void GroundedMovement()
+    private void GroundedMovement(bool jumpPressed)
     {
         // prevent gravity from infinitly building up
         velocity.y = Mathf.Max(velocity.y, 0f);
         jumping = velocity.y > 0f;
 
         // perform jump
-        if (Input.GetButtonDown("Jump"))
+        if (jumpPressed)
         {
             velocity.y = jumpForce;
             jumping = true;
@@ -106,14 +108,14 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void ApplyGravity()
+    private void ApplyGravity(bool jumpHeld, float deltaTime)
     {
         // check if falling
-        bool falling = velocity.y < 0f || !Input.GetButton("Jump");
+        bool falling = velocity.y < 0f || !jumpHeld;
         float multiplier = falling ? 2f : 1f;
 
         // apply gravity and terminal velocity
-        velocity.y += gravity * multiplier * Time.deltaTime;
+        velocity.y += gravity * multiplier * deltaTime;
         velocity.y = Mathf.Max(velocity.y, gravity / 2f);
     }
 
@@ -122,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
             // bounce off enemy head
-            if (transform.DotTest(collision.transform, Vector2.down))
+            if (HasNormal(collision, 0.65f, false))
             {
                 velocity.y = jumpForce / 2f;
                 jumping = true;
@@ -131,10 +133,19 @@ public class PlayerMovement : MonoBehaviour
         else if (collision.gameObject.layer != LayerMask.NameToLayer("PowerUp"))
         {
             // stop vertical movement if mario bonks his head
-            if (transform.DotTest(collision.transform, Vector2.up)) {
+            if (velocity.y > 0f && HasNormal(collision, -0.65f, true)) {
                 velocity.y = 0f;
             }
         }
+    }
+
+    private static bool HasNormal(Collision2D collision, float threshold, bool ceiling)
+    {
+        for (int i = 0; i < collision.contactCount; i++) {
+            float y = collision.GetContact(i).normal.y;
+            if (ceiling ? y < threshold : y > threshold) return true;
+        }
+        return false;
     }
 
 }
