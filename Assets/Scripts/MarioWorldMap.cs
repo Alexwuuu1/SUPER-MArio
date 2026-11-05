@@ -11,6 +11,7 @@ public class MarioWorldMap : MonoBehaviour {
     private void Update(){
         string scene=UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
         var gm=GameManager.Instance;
+        if(MarioPauseMenu.PanelOpen)return;
         if(scene!="Map" || gm==null){previousScene=scene;return;}
         if(previousScene!="Map"){selected=Mathf.Clamp(gm.stage-1,0,3);visualNode=selected;marker=points[selected];moving=false;}
         previousScene=scene;
@@ -32,6 +33,7 @@ public class MarioWorldMap : MonoBehaviour {
         GUI.Label(new Rect(42,25,620,48),"EL REINO CHAMPINON",new GUIStyle(title){fontSize=34,alignment=TextAnchor.MiddleLeft});
         GUI.Label(new Rect(44,74,610,28),$"VIDAS  {gm.lives}     MONEDAS  {gm.coins:00}     PUNTAJE  {gm.score:000000}",new GUIStyle(text){fontSize=17,alignment=TextAnchor.MiddleLeft});
         string[] names={"PRADERA","SUBSUELO","OCEANO","LA FORJA"};
+        GUI.Label(new Rect(40,402,480,30),"DORADO: DISPONIBLE   /   OK: COMPLETADO",new GUIStyle(text){fontSize=14,alignment=TextAnchor.MiddleLeft});
 
         for(int i=0;i<3;i++){
             Vector2 d=points[i+1]-points[i];int dots=60;
@@ -41,7 +43,7 @@ public class MarioWorldMap : MonoBehaviour {
         for(int i=0;i<4;i++){
             var p=points[i];bool open=i<gm.unlockedStage;GUI.enabled=open;
             GUI.backgroundColor=open?new Color(1,.82f,.33f):new Color(.4f,.5f,.46f);
-            if(GUI.Button(new Rect(p.x-35,p.y-24,70,52),open?"1-"+(i+1):"?",button)){if(selected==i&&!moving)gm.LoadLevel(1,i+1);else Select(i);}
+            if(GUI.Button(new Rect(p.x-35,p.y-24,70,52),gm.IsComplete(i+1)?"OK":open?"1-"+(i+1):"?",button)){if(selected==i&&!moving)gm.LoadLevel(1,i+1);else Select(i);}
             GUI.backgroundColor=Color.white;GUI.enabled=true;
             Panel(new Rect(p.x-83,p.y+36,166,29),new Color(.03f,.10f,.13f,.9f));
             GUI.Label(new Rect(p.x-83,p.y+34,166,30),names[i],new GUIStyle(text){fontSize=15,fontStyle=FontStyle.Bold});
