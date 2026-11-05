@@ -33,7 +33,8 @@ public class BlockHit : MonoBehaviour
         }
 
         if (item != null) {
-            Instantiate(item, transform.position, Quaternion.identity);
+            var spawned = Instantiate(item, transform.position, Quaternion.identity);
+            spawned.SetActive(true);
         }
 
         StartCoroutine(Animate());
