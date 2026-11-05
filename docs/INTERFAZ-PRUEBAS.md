@@ -13,3 +13,8 @@ Unity 6000.3.16f1. Pruebas automatizadas en Play Mode mediante batchmode.
 
 - Aplicado por separado y revisado: pausa persistente, continuar, reiniciar, ajustes y retorno al menu; bloqueo de entrada acuatico durante la pausa.
 - Pruebas de Unity pendientes por indicacion del usuario; las realizara el responsable de integracion.
+
+## Paso 03
+
+- Aplicado por separado y revisado: volumen independiente de musica y efectos mediante PlayerPrefs, sonido de prueba durante pausa y panel de controles.
+- Pruebas de Unity, persistencia tras cerrar y abrir, revision visual y auditiva pendientes por indicacion del usuario.

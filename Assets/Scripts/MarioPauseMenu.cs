@@ -5,6 +5,7 @@ public class MarioPauseMenu : MonoBehaviour
 {
     public static bool IsPaused { get; private set; }
     private bool settings, controls;
+    public static bool PanelOpen { get; private set; }
     private int selection;
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Install() {
@@ -13,9 +14,10 @@ public class MarioPauseMenu : MonoBehaviour
     }
     private void Awake(){SceneManager.sceneLoaded+=Loaded;}
     private void OnDestroy(){SceneManager.sceneLoaded-=Loaded;SetPaused(false);}
-    private void Loaded(Scene scene,LoadSceneMode mode){SetPaused(false);settings=controls=false;}
+    private void Loaded(Scene scene,LoadSceneMode mode){SetPaused(false);settings=controls=false;PanelOpen=false;}
     public static void SetPaused(bool value){IsPaused=value;Time.timeScale=value?0:1;AudioListener.pause=value;}
     private void Update(){
+        PanelOpen=settings||controls;
         var gm=GameManager.Instance;
         if(gm==null)return;
         if(Input.GetKeyDown(KeyCode.Escape)){
@@ -46,6 +48,7 @@ public class MarioPauseMenu : MonoBehaviour
             if(GUI.Button(new Rect(180,15,170,38),"CONTROLES",button))controls=true;
         }
         if(!IsPaused&&!settings&&!controls)return;
+        PanelOpen=true;
         GUI.color=new Color(0,0,0,.82f);GUI.DrawTexture(new Rect(0,0,960,540),Texture2D.whiteTexture);GUI.color=Color.white;
         GUI.Box(new Rect(230,55,500,435),"");
         if(controls){
@@ -64,6 +67,9 @@ public class MarioPauseMenu : MonoBehaviour
         GUI.Label(new Rect(250,75,460,55),"AJUSTES",label);
         GUI.Label(new Rect(260,145,440,45),"Musica: "+Mathf.RoundToInt(MarioAudio.MusicVolume*100)+"%",label);
         MarioAudio.MusicVolume=GUI.HorizontalSlider(new Rect(310,200,340,25),MarioAudio.MusicVolume,0,1);
-        if(GUI.Button(new Rect(350,395,260,45),"VOLVER",button))settings=false;
+        GUI.Label(new Rect(260,240,440,45),"Efectos: "+Mathf.RoundToInt(MarioAudio.EffectsVolume*100)+"%",label);
+        MarioAudio.EffectsVolume=GUI.HorizontalSlider(new Rect(310,295,340,25),MarioAudio.EffectsVolume,0,1);
+        if(GUI.Button(new Rect(350,340,260,40),"PROBAR SONIDO",button)) { MarioAudio.PlayPreview("coin"); }
+        if(GUI.Button(new Rect(350,395,260,45),"GUARDAR Y VOLVER",button)){PlayerPrefs.Save();settings=false;}
     }
 }

@@ -11,14 +11,14 @@ public class MarioScreen : MonoBehaviour
     private string Scene => SceneManager.GetActiveScene().name;
     private void Update()
     {
-        if(MarioPauseMenu.IsPaused)return;
+        if(MarioPauseMenu.IsPaused || MarioPauseMenu.PanelOpen)return;
         if (selectingLevel) { if(Input.GetKeyDown(KeyCode.Escape))selectingLevel=false;return; }
         if (Scene == "Menu") {
             if (Input.GetKeyDown(KeyCode.DownArrow)) { selection = (selection+1)%2; MarioAudio.Play("coin"); }
             if (Input.GetKeyDown(KeyCode.UpArrow)) { selection = (selection+1)%2; MarioAudio.Play("coin"); }
             if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)) { if(selection==1)selectingLevel=true;else GameManager.Instance.NewGame(); }
         } else if (Scene=="Map") {
-            if (Input.GetKeyDown(KeyCode.Return)) GameManager.Instance.LoadLevel(1,GameManager.Instance.stage);
+            // Map keyboard navigation belongs to MarioWorldMap.
         } else if (!GameManager.Instance.playing && Input.GetKeyDown(KeyCode.Return)) GameManager.Instance.NewGame();
     }
     private void OnGUI()
@@ -35,6 +35,7 @@ public class MarioScreen : MonoBehaviour
         }
         var gm=GameManager.Instance;
         if (gm == null) return;
+        if(MarioPauseMenu.IsPaused || MarioPauseMenu.PanelOpen)return;
         GUI.Label(new Rect(750,Scene.StartsWith("1-")?60:10,200,25),"MUSICA  "+Mathf.RoundToInt(MarioAudio.MusicVolume*100)+"%  [M]",new GUIStyle(text){fontSize=14});
         MarioAudio.MusicVolume=GUI.HorizontalSlider(new Rect(805,Scene.StartsWith("1-")?87:38,120,15),MarioAudio.MusicVolume,0,1);
         if (selectingLevel) { DrawSelector(gm); return; }

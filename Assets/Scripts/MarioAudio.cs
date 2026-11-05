@@ -6,22 +6,33 @@ public class MarioAudio : MonoBehaviour
 {
     private static MarioAudio instance;
     private readonly Dictionary<string,AudioClip> clips=new Dictionary<string,AudioClip>();
-    private AudioSource music, effects;
-    public static float MusicVolume { get; set; } = .65f;
+    private AudioSource music, effects, preview;
+    private static float musicVolume=-1, effectsVolume=-1;
+    public static float MusicVolume {
+        get { if(musicVolume<0)musicVolume=PlayerPrefs.GetFloat("audio.music",.65f);return musicVolume; }
+        set { float v=Mathf.Clamp01(value);if(Mathf.Approximately(v,MusicVolume))return;musicVolume=v;PlayerPrefs.SetFloat("audio.music",v); }
+    }
+    public static float EffectsVolume {
+        get { if(effectsVolume<0)effectsVolume=PlayerPrefs.GetFloat("audio.effects",.65f);return effectsVolume; }
+        set { float v=Mathf.Clamp01(value);if(Mathf.Approximately(v,EffectsVolume))return;effectsVolume=v;PlayerPrefs.SetFloat("audio.effects",v); }
+    }
     public static bool MusicPlaying => instance!=null && instance.music!=null && instance.music.isPlaying;
     private void Awake() {
-        instance=this; music=gameObject.AddComponent<AudioSource>(); effects=gameObject.AddComponent<AudioSource>();
+        instance=this; preview=gameObject.AddComponent<AudioSource>();preview.ignoreListenerPause=true;preview.spatialBlend=0; music=gameObject.AddComponent<AudioSource>(); effects=gameObject.AddComponent<AudioSource>();
         music.loop=true; music.volume=MusicVolume; music.spatialBlend=0; music.playOnAwake=false;
         effects.volume=.65f; effects.spatialBlend=0;
         clips["jump"]=Tone(350,950,.14f); clips["stomp"]=Tone(180,50,.13f);
         clips["coin"]=Tone(1000,1700,.12f); clips["powerup"]=Tone(300,1400,.5f);
         clips["damage"]=Tone(500,90,.3f); clips["death"]=Tone(550,60,.9f);
         clips["win"]=Tone(400,1300,.65f);
+        clips["fire"]=Tone(850,190,.13f);clips["impact"]=Tone(150,40,.16f);
         SceneManager.sceneLoaded+=Loaded;
     }
     private void OnDestroy() { SceneManager.sceneLoaded-=Loaded; if(instance==this)instance=null; }
     private void Start() { if(music.clip==null)Loaded(SceneManager.GetActiveScene(),LoadSceneMode.Single); }
-    private void Update() { music.volume=MusicVolume; if(Input.GetKeyDown(KeyCode.M)) MusicVolume=MusicVolume>0?0:.65f; }
+    private void OnApplicationPause(bool paused){if(paused)PlayerPrefs.Save();}
+    private void OnApplicationQuit(){PlayerPrefs.Save();}
+    private void Update() { music.volume=MusicVolume;effects.volume=EffectsVolume; if(Input.GetKeyDown(KeyCode.M)) MusicVolume=MusicVolume>0?0:.65f; }
     private void Loaded(Scene scene,LoadSceneMode mode) {
         music.Stop();
         if(scene.name=="GameOver") { Play("death"); return; }
@@ -29,6 +40,7 @@ public class MarioAudio : MonoBehaviour
         int theme=scene.name=="1-2"?1:scene.name=="1-3"?2:scene.name=="1-4"?3:0;
         music.clip=Melody(theme); music.Play();
     }
+    public static void PlayPreview(string cue){if(instance!=null && instance.clips.TryGetValue(cue,out var clip)){instance.preview.volume=EffectsVolume;instance.preview.PlayOneShot(clip);}}
     public static void Play(string cue) { if(instance!=null && instance.clips.TryGetValue(cue,out var clip)) instance.effects.PlayOneShot(clip); }
     private static AudioClip Tone(float from,float to,float duration) {
         int n=(int)(22050*duration); var samples=new float[n]; float phase=0;
