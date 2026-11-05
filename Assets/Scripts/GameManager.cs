@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
     public int lives { get; private set; }
     public int coins { get; private set; }
     public int score { get; private set; }
+    public int completedMask { get; private set; }
+    public bool IsComplete(int number) => (completedMask & (1 << (number-1))) != 0;
     public int unlockedStage { get; private set; } = 1;
     public bool testingLevel { get; private set; }
     public float timeRemaining { get; private set; } = 400f;
@@ -62,6 +64,7 @@ public class GameManager : MonoBehaviour
         coins = 0;
         score = 0;
         unlockedStage = 1;
+        completedMask = 0;
         testingLevel = false;
         stage = 1;
         SceneManager.LoadScene("Map");
@@ -92,6 +95,7 @@ public class GameManager : MonoBehaviour
 
     public void NextLevel()
     {
+        if(!testingLevel)completedMask |= 1 << (stage-1);
         CancelInvoke(); changingScene=true;
         if (stage >= 4) SceneManager.LoadScene("Victory");
         else { unlockedStage = Mathf.Max(unlockedStage,stage+1); stage++; SceneManager.LoadScene("Map"); }
