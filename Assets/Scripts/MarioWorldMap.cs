@@ -5,6 +5,10 @@ public class MarioWorldMap : MonoBehaviour {
     public void Draw(GameManager gm, GUIStyle title, GUIStyle text, GUIStyle button, System.Action selectLevels) {
         if(mapLandscape==null)mapLandscape=MakeLandscape();
         GUI.DrawTexture(new Rect(0,0,960,540),mapLandscape);
+        for(int tree=0;tree<8;tree++)GUI.DrawTexture(new Rect(74+tree*43,154+(tree%3)*30,35,48),WorldMapSprites.Get(0));
+        GUI.DrawTexture(new Rect(310,153,86,72),WorldMapSprites.Get(1));
+        GUI.DrawTexture(new Rect(550,235+Mathf.Sin(Time.unscaledTime)*3,65,65),WorldMapSprites.Get(2));
+        GUI.DrawTexture(new Rect(745,136,90,90),WorldMapSprites.Get(3));
         Panel(new Rect(22,20,916,98),new Color(.035f,.10f,.16f,.94f));
         GUI.Label(new Rect(42,25,620,48),"EL REINO CHAMPINON",new GUIStyle(title){fontSize=34,alignment=TextAnchor.MiddleLeft});
         GUI.Label(new Rect(44,74,610,28),$"VIDAS  {gm.lives}     MONEDAS  {gm.coins:00}     PUNTAJE  {gm.score:000000}",new GUIStyle(text){fontSize=17,alignment=TextAnchor.MiddleLeft});
